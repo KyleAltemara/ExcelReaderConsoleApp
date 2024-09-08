@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
+﻿using OfficeOpenXml;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Reflection;
@@ -216,24 +215,5 @@ internal class Program
         }
 
         return string.Concat(words);
-    }
-}
-
-public class ExcelDbContext(string dbPath, List<Type> dynamicEntityTypes) : DbContext
-{
-    private readonly string dbPath = dbPath;
-    private readonly List<Type> dynamicEntityTypes = dynamicEntityTypes;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlite($"Data Source={dbPath}");
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        foreach (var entityType in dynamicEntityTypes)
-        {
-            modelBuilder.Entity(entityType);
-        }
     }
 }
