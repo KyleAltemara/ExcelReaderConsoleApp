@@ -1,9 +1,18 @@
-﻿using OfficeOpenXml;
+﻿using ExcelReaderConsoleApp.Interfaces;
+using OfficeOpenXml;
 
 namespace ExcelReaderConsoleApp;
 
+/// <summary>
+/// Represents a class for reading Excel files.
+/// </summary>
 public class ExcelFileReader : IExcelFileReader
 {
+    /// <summary>
+    /// Reads Excel files from the specified directory path.
+    /// </summary>
+    /// <param name="directoryPath">The directory path containing the Excel files.</param>
+    /// <returns>A list of ExcelPackage objects representing the read Excel files. Only Excel files with tables are included.</returns>
     public List<ExcelPackage> ReadExcelFiles(string directoryPath)
     {
         List<ExcelPackage> packages = [];

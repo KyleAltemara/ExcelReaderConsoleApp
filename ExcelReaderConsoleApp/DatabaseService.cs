@@ -1,16 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ExcelReaderConsoleApp.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace ExcelReaderConsoleApp;
 
-public class DatabaseService : IDatabaseService
+/// <summary>
+/// Represents a service for saving data to a database.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="DatabaseService"/> class.
+/// </remarks>
+/// <param name="logger">The logger of type <see cref="ILogger{DatabaseService}"/>.</param>
+public class DatabaseService(ILogger<DatabaseService> logger) : IDatabaseService
 {
-    private readonly ILogger<DatabaseService> _logger;
+    private readonly ILogger<DatabaseService> _logger = logger;
 
-    public DatabaseService(ILogger<DatabaseService> logger)
-    {
-        _logger = logger;
-    }
-
+    /// <summary>
+    /// Saves the data to the database.
+    /// </summary>
+    /// <param name="dbPath">The path of the database file.</param>
+    /// <param name="dynamicEntityTypes">The dynamic entity types.</param>
+    /// <param name="tablesData">The tables data.</param>
     public void SaveData(string dbPath, List<Type> dynamicEntityTypes, Dictionary<string, List<object>> tablesData)
     {
         if (File.Exists(dbPath))
@@ -40,7 +49,6 @@ public class DatabaseService : IDatabaseService
             finally
             {
                 context?.Dispose();
-                _logger.LogInformation("ExcelDbContext disposed.");
             }
         }
     }

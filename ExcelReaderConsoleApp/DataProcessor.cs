@@ -1,12 +1,29 @@
-﻿using OfficeOpenXml;
+﻿using ExcelReaderConsoleApp.Interfaces;
+using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using System.Globalization;
 
 namespace ExcelReaderConsoleApp;
 
-public class DataProcessor(DynamicTypeBuilder typeBuilder) : IDataProcessor
+/// <summary>
+/// Represents a data processor for processing Excel data.
+/// </summary>
+/// <remarks>
+/// Initializes a new instance of the <see cref="DataProcessor"/> class.
+/// </remarks>
+/// <param name="typeBuilder">The dynamic type builder.</param>
+/// <param name="logger">The logger of type <see cref="ILogger{DataProcessor}"/>.</param>
+public class DataProcessor(DynamicTypeBuilder typeBuilder, ILogger<DataProcessor> logger) : IDataProcessor
 {
-    private readonly DynamicTypeBuilder _typeBuilder = typeBuilder;
+    private readonly DynamicTypeBuilder _typeBuilder = typeBuilder ?? throw new ArgumentNullException(nameof(typeBuilder));
 
+    private readonly ILogger<DataProcessor> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+    /// <summary>
+    /// Processes the data from the specified Excel package.
+    /// </summary>
+    /// <param name="package">The Excel package.</param>
+    /// <returns>A tuple containing the dynamic entity types and the tables data.</returns>
     public (List<Type> dynamicEntityTypes, Dictionary<string, List<object>> tablesData) ProcessData(ExcelPackage package)
     {
         List<Type> dynamicEntityTypes = [];
@@ -17,8 +34,8 @@ public class DataProcessor(DynamicTypeBuilder typeBuilder) : IDataProcessor
         {
             foreach (var table in worksheet.Tables)
             {
-                Console.WriteLine($"Worksheet Name: {worksheet.Name}");
-                Console.WriteLine($"Table Name: {table.Name}");
+                _logger.LogInformation("Worksheet Name: {worksheet}", worksheet.Name);
+                _logger.LogInformation("Table Name: {table}", table.Name);
                 var range = table.Range;
                 List<string> tableHeaders = ["PrimaryKey"];
                 for (int column = range.Start.Column; column <= range.End.Column; column++)
@@ -99,6 +116,11 @@ public class DataProcessor(DynamicTypeBuilder typeBuilder) : IDataProcessor
         return (dynamicEntityTypes, tablesData);
     }
 
+    /// <summary>
+    /// Itterates through the column data and determines the type of the column. If the column contains a mix of types, it will default to string.
+    /// </summary>
+    /// <param name="columnData"> The data in the column. </param>
+    /// <returns> The type of the column. </returns>
     private static Type GetColumnType(List<string> columnData)
     {
         Type? columnType = null;
@@ -133,6 +155,11 @@ public class DataProcessor(DynamicTypeBuilder typeBuilder) : IDataProcessor
         return columnType is null ? typeof(string) : columnType;
     }
 
+    /// <summary>
+    /// Converts the input string to upper camel case.
+    /// </summary>
+    /// <param name="input"> The input string. </param>
+    /// <returns> The input string in upper camel case. </returns>
     private static string ToUpperCamelCase(string input)
     {
         if (string.IsNullOrEmpty(input))

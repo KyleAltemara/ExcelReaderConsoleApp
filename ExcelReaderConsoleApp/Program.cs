@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ExcelReaderConsoleApp.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
@@ -10,17 +11,17 @@ internal class Program
     {
         var serviceProvider = new ServiceCollection()
             .AddLogging(configure => configure.AddConsole()) // Add logging services and configure console output
-            .AddSingleton<DynamicTypeBuilder>()
-            .AddSingleton<IExcelFileReader, ExcelFileReader>()
-            .AddSingleton<IDataProcessor, DataProcessor>()
-            .AddSingleton<IDatabaseService, DatabaseService>()
-            .BuildServiceProvider();
+            .AddSingleton<DynamicTypeBuilder>() // Register the DynamicTypeBuilder service
+            .AddSingleton<IExcelFileReader, ExcelFileReader>() // Register the IExcelFileReader service
+            .AddSingleton<IDataProcessor, DataProcessor>() // Register the IDataProcessor service
+            .AddSingleton<IDatabaseService, DatabaseService>() // Register the IDatabaseService service
+            .BuildServiceProvider(); // Build the service provider
 
         // Set the logging level (optional)
         var logger = serviceProvider.GetService<ILogger<Program>>();
         logger?.LogInformation("Application started.");
 
-        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial; // License context required for EPPlus
         var directoryPath = "../../../../ExcelFiles";
         var excelFileReader = serviceProvider.GetService<IExcelFileReader>();
         var dataProcessor = serviceProvider.GetService<IDataProcessor>();

@@ -1,4 +1,4 @@
-﻿namespace ExcelReaderConsoleApp;
+﻿namespace ExcelReaderConsoleApp.Interfaces;
 
 public interface IDatabaseService
 {

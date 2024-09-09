@@ -1,6 +1,6 @@
 ﻿using OfficeOpenXml;
 
-namespace ExcelReaderConsoleApp;
+namespace ExcelReaderConsoleApp.Interfaces;
 
 public interface IExcelFileReader
 {
