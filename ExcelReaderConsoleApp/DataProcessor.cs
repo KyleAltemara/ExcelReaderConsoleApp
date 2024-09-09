@@ -32,10 +32,10 @@ public class DataProcessor(DynamicTypeBuilder typeBuilder, ILogger<DataProcessor
         var workbook = package.Workbook;
         foreach (var worksheet in workbook.Worksheets)
         {
+            _logger.LogInformation("Reading in data from worksheet {worksheet}", worksheet.Name);
             foreach (var table in worksheet.Tables)
             {
-                _logger.LogInformation("Worksheet Name: {worksheet}", worksheet.Name);
-                _logger.LogInformation("Table Name: {table}", table.Name);
+                _logger.LogInformation("Reading in data from Table: {table}", table.Name);
                 var range = table.Range;
                 List<string> tableHeaders = ["PrimaryKey"];
                 for (int column = range.Start.Column; column <= range.End.Column; column++)

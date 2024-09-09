@@ -15,6 +15,7 @@ internal class Program
             .AddSingleton<IExcelFileReader, ExcelFileReader>() // Register the IExcelFileReader service
             .AddSingleton<IDataProcessor, DataProcessor>() // Register the IDataProcessor service
             .AddSingleton<IDatabaseService, DatabaseService>() // Register the IDatabaseService service
+            .AddSingleton<IDataDisplayService, DataDisplayService>() // Register the IDataDisplayService service
             .BuildServiceProvider(); // Build the service provider
 
         // Set the logging level (optional)
@@ -26,7 +27,8 @@ internal class Program
         var excelFileReader = serviceProvider.GetService<IExcelFileReader>();
         var dataProcessor = serviceProvider.GetService<IDataProcessor>();
         var databaseService = serviceProvider.GetService<IDatabaseService>();
-        if (excelFileReader is null || dataProcessor is null || databaseService is null)
+        var dataDisplayService = serviceProvider.GetService<IDataDisplayService>();
+        if (excelFileReader is null || dataProcessor is null || databaseService is null || dataDisplayService is null)
         {
             logger?.LogError("Failed to resolve services.");
             return;
@@ -38,6 +40,7 @@ internal class Program
             var (dynamicEntityTypes, tablesData) = dataProcessor.ProcessData(package);
             var dbPath = Path.Combine(package.File.DirectoryName!, $"{Path.GetFileNameWithoutExtension(package.File.Name)}.db");
             databaseService.SaveData(dbPath, dynamicEntityTypes, tablesData);
+            dataDisplayService.DisplayData(dbPath); // Display the data from the database
         }
 
         logger?.LogInformation("Application finished.");

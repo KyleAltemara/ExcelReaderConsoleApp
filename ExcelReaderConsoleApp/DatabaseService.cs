@@ -29,27 +29,26 @@ public class DatabaseService(ILogger<DatabaseService> logger) : IDatabaseService
 
         var typeBuilder = new DynamicTypeBuilder();
         var contextType = typeBuilder.CreateInheritedType(dbPath, typeof(ExcelDbContext), [typeof(string), typeof(List<Type>)]);
-        using (var context = Activator.CreateInstance(contextType, dbPath, dynamicEntityTypes) as ExcelDbContext)
+        using var context = Activator.CreateInstance(contextType, dbPath, dynamicEntityTypes) as ExcelDbContext;
+        try
         {
-            try
+            context!.Database.EnsureCreated();
+            foreach (var tableData in tablesData)
             {
-                context!.Database.EnsureCreated();
-                foreach (var tableData in tablesData)
-                {
-                    context.AddRange(tableData.Value);
-                }
+                context.AddRange(tableData.Value);
+            }
 
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while saving data to the database.");
-                throw;
-            }
-            finally
-            {
-                context?.Dispose();
-            }
+            context.SaveChanges();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while saving data to the database.");
+            throw;
+        }
+        finally
+        {
+            _logger.LogInformation("Data saved to database: {dbPath}", dbPath);
+            context?.Dispose();
         }
     }
 }
